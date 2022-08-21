@@ -1,9 +1,9 @@
-import './css/styles.css';
-import SimpleLightbox from 'simplelightbox';
+import simpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import './css/styles.css';
 import Notiflix from 'notiflix';
-import { Notify } from 'notiflix';
 import axios from 'axios';
+
 const searchFormEl = document.querySelector('#search-form');
 const searchTextEl = document.querySelector('[type="text"]');
 const buttonSearchEl = document.querySelector('[type="submit"]');
@@ -18,7 +18,8 @@ const createGallery = photoArry => {
   const result = photoArry.reduce(
     (acc, item) =>
       (acc += `
-        <div class="photo-card">
+       <div class="photo-card">
+        <a class="gallery__link" href="${item.largeImageURL}">
             <img src="${item.webformatURL}" alt="${item.tags}" loading="lazy" />
             <div class="info">
               <p class="info-item"><b>Likes</b> ${item.likes}</p>
@@ -26,6 +27,7 @@ const createGallery = photoArry => {
               <p class="info-item"><b>Comments</b> ${item.comments}</p>
               <p class="info-item"><b>Downloads</b> ${item.downloads}</p>
             </div>
+            </a>
         </div>`),
     ''
   );
@@ -88,3 +90,13 @@ function handelLoadMore(evt) {
   getPhotos();
   loadMoreEl.setAttribute('disabled', true);
 }
+
+let gallery = new SimpleLightbox('.gallery a');
+gallery.on('show.simplelightbox', function () {});
+
+const lightbox = new SimpleLightbox('.gallery a', {
+  captionSelector: 'img',
+  captionsData: 'alt',
+  captionPosition: 'bottom',
+  captionDelay: 250,
+});
