@@ -98,13 +98,3 @@ function handelLoadMore(evt) {
   getPhotos();
   loadMoreEl.setAttribute('disabled', true);
 }
-
-let gallery = new SimpleLightbox('.gallery a');
-gallery.on('show.simplelightbox', function () {});
-
-const lightbox = new SimpleLightbox('.gallery a', {
-  captionSelector: 'img',
-  captionsData: 'alt',
-  captionPosition: 'bottom',
-  captionDelay: 250,
-});
