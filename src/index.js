@@ -1,12 +1,18 @@
 import './css/styles.css';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
+import Notiflix from 'notiflix';
 import { Notify } from 'notiflix';
 import axios from 'axios';
 const searchFormEl = document.querySelector('#search-form');
 const searchTextEl = document.querySelector('[type="text"]');
 const buttonSearchEl = document.querySelector('[type="submit"]');
 const galleryEl = document.querySelector('.gallery');
+const loadMoreEl = document.querySelector('.load-more');
 
 let searchText = '';
+let pageNumber = 1;
+let pageNumbers = 0;
 
 const createGallery = photoArry => {
   const result = photoArry.reduce(
@@ -23,32 +29,62 @@ const createGallery = photoArry => {
         </div>`),
     ''
   );
-  galleryEl.insertAdjacentHTML('afterbegin', result);
+  galleryEl.insertAdjacentHTML('beforeend', result);
+  loadMoreEl.classList.remove('visually-hidden');
+  loadMoreEl.removeAttribute('disabled');
+  if (pageNumbers <= pageNumber) {
+    loadMoreEl.classList.add('visually-hidden');
+    Notiflix.Notify.info(
+      `We're sorry, but you've reached the end of search results.`
+    );
+  }
 };
 
 searchTextEl.addEventListener('input', e => {
   searchText = searchTextEl.value;
+
   console.log(searchTextEl.value);
 });
+
 buttonSearchEl.addEventListener('click', handelSubmit);
 function handelSubmit(evt) {
   evt.preventDefault();
+  galleryEl.innerHTML = '';
+  pageNumber = 1;
+  pageNumbers = 0;
   getPhotos();
 }
 
 const getPhotos = async () => {
   try {
     const response = await axios.get(
-      `https://pixabay.com/api/?key=26390614-440d4a1ea806ddcf9832f9246&q=${searchText}&image_type=photo&orientation=horizontal&safesearch=true`
+      `https://pixabay.com/api/?key=26390614-440d4a1ea806ddcf9832f9246&q=${searchText}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&page=${pageNumber}`
     );
-    console.log(response.data.hits);
-    createGallery(response.data.hits);
+    console.log(response.data);
+    Notiflix.Notify.success(
+      `Hooray! We found ${response.data.hits.length} totalHits images.`
+    );
+    pageNumbers = Math.ceil(
+      response.data.totalHits / response.data.hits.length
+    );
+    if (response.data.hits.length > 0) {
+      createGallery(response.data.hits);
+    } else {
+      Notiflix.Notify.failure(
+        `Sorry, there are no images matching your search query. Please try again.`
+      );
+    }
   } catch (error) {
     console.log(error);
-    window.alert(
-      `Sorry, there are no images matching your search query. Please try again.`
-    );
+    Notiflix.Notify.failure(`Error`);
+  } finally {
+    pageNumber += 1;
   }
 };
 
-// https://pixabay.com/api/?key=26390614-440d4a1ea806ddcf9832f9246&q=${input}&image_type=photo&orientation=horizontal&safesearch=true
+loadMoreEl.addEventListener('click', handelLoadMore);
+function handelLoadMore(evt) {
+  evt.preventDefault();
+  getPhotos();
+  loadMoreEl.setAttribute('disabled', true);
+}
