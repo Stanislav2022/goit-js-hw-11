@@ -37,6 +37,7 @@ const createGallery = photoArry => {
   gallery.on('show.simplelightbox', function () {
     // do something…
   });
+  gallery.refresh();
   loadMoreEl.classList.remove('visually-hidden');
   loadMoreEl.removeAttribute('disabled');
   if (pageNumbers <= pageNumber) {
@@ -56,7 +57,7 @@ searchTextEl.addEventListener('input', e => {
     buttonSearchEl.setAttribute('disabled', true);
   }
 });
-buttonSearchEl.addEventListener('click', handelSubmit);
+buttonSearchEl.addEventListener('submit', handelSubmit);
 function handelSubmit(evt) {
   evt.preventDefault();
   galleryEl.innerHTML = '';
@@ -83,7 +84,6 @@ const getPhotos = async () => {
         `Sorry, there are no images matching your search query. Please try again.`
       );
     }
-    gallery.refresh();
   } catch (error) {
     console.log(error);
     Notiflix.Notify.failure(`Error`);
