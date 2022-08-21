@@ -57,7 +57,7 @@ searchTextEl.addEventListener('input', e => {
     buttonSearchEl.setAttribute('disabled', true);
   }
 });
-buttonSearchEl.addEventListener('submit', handelSubmit);
+buttonSearchEl.addEventListener('click', handelSubmit);
 function handelSubmit(evt) {
   evt.preventDefault();
   galleryEl.innerHTML = '';
