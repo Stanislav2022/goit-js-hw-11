@@ -1,4 +1,4 @@
-import simpleLightbox from 'simplelightbox';
+import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import './css/styles.css';
 import Notiflix from 'notiflix';
@@ -13,6 +13,7 @@ const loadMoreEl = document.querySelector('.load-more');
 let searchText = '';
 let pageNumber = 1;
 let pageNumbers = 0;
+buttonSearchEl.setAttribute('disabled', true);
 
 const createGallery = photoArry => {
   const result = photoArry.reduce(
@@ -32,6 +33,10 @@ const createGallery = photoArry => {
     ''
   );
   galleryEl.insertAdjacentHTML('beforeend', result);
+  let gallery = new SimpleLightbox('.gallery a');
+  gallery.on('show.simplelightbox', function () {
+    // do something…
+  });
   loadMoreEl.classList.remove('visually-hidden');
   loadMoreEl.removeAttribute('disabled');
   if (pageNumbers <= pageNumber) {
@@ -43,11 +48,14 @@ const createGallery = photoArry => {
 };
 
 searchTextEl.addEventListener('input', e => {
-  searchText = searchTextEl.value;
-
-  console.log(searchTextEl.value);
+  searchText = searchTextEl.value.trim();
+  console.log(searchTextEl.value.trim());
+  if (searchText !== '') {
+    buttonSearchEl.removeAttribute('disabled');
+  } else {
+    buttonSearchEl.setAttribute('disabled', true);
+  }
 });
-
 buttonSearchEl.addEventListener('click', handelSubmit);
 function handelSubmit(evt) {
   evt.preventDefault();
@@ -56,7 +64,6 @@ function handelSubmit(evt) {
   pageNumbers = 0;
   getPhotos();
 }
-
 const getPhotos = async () => {
   try {
     const response = await axios.get(
@@ -76,6 +83,7 @@ const getPhotos = async () => {
         `Sorry, there are no images matching your search query. Please try again.`
       );
     }
+    gallery.refresh();
   } catch (error) {
     console.log(error);
     Notiflix.Notify.failure(`Error`);
